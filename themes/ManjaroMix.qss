@@ -19,6 +19,7 @@ QPlainTextEdit {
 	background-color: #222b2e;
 	color: #d3dae3;
 }
+
 QToolButton {
 	border-style: solid;
 	border-top-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgb(215, 215, 215), stop:1 rgb(222, 222, 222));
@@ -522,4 +523,23 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 }
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
    background: none;
+}
+
+QWidget#databasesList, QWidget#tablesList{
+	border-right:1px;
+	border-color: black;
+	border-style: solid;
+}
+QWidget#databasesList > QPushButton, QWidget#tablesList > QPushButton{
+	border-radius: 0;
+	border-top: none;
+	border-left:none;
+	border-right:none;
+	border-color:#4fa08b;
+	margin: 2px;
+	text-align:left;
+}
+
+QWidget#databasesList > QPushButton:checked, QWidget#tablesList > QPushButton:checked{
+	color: gold;
 }
