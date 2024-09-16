@@ -1,8 +1,12 @@
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QDesktopWidget,QHBoxLayout, QScrollArea, QTabWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QDesktopWidget, QHBoxLayout, QScrollArea, QTabWidget
 from mysql_connect import MySQLConnect
-import sys, json
+import sys
+import json
 from inputs import Inputs
+from database_list import DatabaseList
+from tables_list import TablesList
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,11 +14,19 @@ class MainWindow(QMainWindow):
         self.inputs = Inputs()
         self.initUI()
         self.load_connection()
+        self.connection = None
 
     def initUI(self):
         self.setWindowTitle("CrunchSQL - Database Manager")
         self.setFixedSize(QSize(350, 200))
-        
+        self.set_theme()
+
+        layout = self.create_connection_form()
+        self.main_view = QWidget()
+        self.main_view.setLayout(layout)
+        self.setCentralWidget(self.main_view)
+
+    def set_theme(self):
         try:
             with open('themes/ManjaroMix.qss', 'r') as file:
                 theme = file.read()
@@ -22,171 +34,80 @@ class MainWindow(QMainWindow):
         except FileNotFoundError:
             print("Theme file not found. Using default theme.")
 
-        layout = self.connectionForm()
-        self.mainView = QWidget()
-        self.mainView.setLayout(layout)
-        self.setCentralWidget(self.mainView)
-
-    def connectionForm(self) -> QVBoxLayout:
+    def create_connection_form(self) -> QVBoxLayout:
         layout = QVBoxLayout()
-        layout.addWidget(self.inputs.text("Host"))
-        layout.addWidget(self.inputs.text("User"))
-        layout.addWidget(self.inputs.password("Password"))
-        layout.addWidget(self.inputs.checkbox("Save connection?"))
+        layout.addWidget(self.inputs.create_text_input("Host"))
+        layout.addWidget(self.inputs.create_text_input("User"))
+        layout.addWidget(self.inputs.create_password_input("Password"))
+        layout.addWidget(self.inputs.create_checkbox("Save connection?"))
         layout.addSpacing(40)
-        layout.addWidget(Inputs.button("Connect", self.submit_connection))
+        layout.addWidget(Inputs.create_button("Connect", self.submit_connection))
         layout.setAlignment(Qt.AlignTop)
         layout.setContentsMargins(0, 30, 0, 0)
         return layout
-
-    def databasesList(self) -> QWidget:
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignTop)
-        self.databases = []
-        self.clearSpacing(layout)
-        for record in self.connection.query:
-            button = Inputs.button(record[0], lambda checked, db=record[0]: self.selectDatabase(db))
-            self.databases.append(button)
-            button.setFixedWidth(250)
-            layout.addWidget(button)
-
-
-        scroll = QScrollArea()             # Scroll Area which contains the widgets, set as the centralWidget
-        widget = QWidget()                 # Widget that contains the collection of Vertical Box
-        widget.setLayout(layout)
-        widget.setFixedWidth(250)
-        widget.setObjectName("databasesList")
-        #Scroll Area Properties
-        #self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        scroll.setWidget(widget)
-
-        return scroll
-
-    def selectDatabase(self,database):
-        print(database)
-        print(self.vbox.count())
-
-        for db in self.databases:
-            db.setChecked(False)
-            if(db.text() == database):
-                db.setChecked(True)
-            
-
-        for i in reversed(range(self.vbox.count())): 
-            self.vbox.itemAt(i).widget().deleteLater()
-
-        self.connection.use_database(database)
-        self.tables = []
-        for table in self.connection.fetch_tables():
-            button = self.inputs.button(table[0], lambda checked, table=table[0]: self.selectTable(table))
-            self.tables.append(button)
-            button.setFixedWidth(250)
-            self.vbox.addWidget(button)
-        self.leftTabBar.setCurrentIndex(1)
-
-    def selectTable(self,table):
-        print(table)
-        for table_ in self.tables:
-            table_.setChecked(False)
-            if(table_.text() == table):
-                table_.setChecked(True)
 
     def submit_connection(self):
         self.setFixedSize(QSize(1250, 700))
         self.center()
 
-        localhost = self.inputs.fields["Host"].text()
+        host = self.inputs.fields["Host"].text()
         user = self.inputs.fields["User"].text()
         password = self.inputs.fields["Password"].text()
-        saveme = self.inputs.fields["Save connection?"]
+        save_connection = self.inputs.fields["Save connection?"]
 
-        if saveme.isChecked():
-            self.save_connection(localhost, user, password)
+        if save_connection.isChecked():
+            self.save_connection(host, user, password)
         else:
             self.save_connection("", "", "")
 
         try:
-            self.connection = MySQLConnect(localhost, user, password)
+            self.connection = MySQLConnect(host, user, password)
         except Exception as e:
             print(f"Error connecting to database: {e}")
             return
 
-        self.scroll = QScrollArea()             # Scroll Area which contains the widgets, set as the centralWidget
-        self.widget = QWidget()                 # Widget that contains the collection of Vertical Box
-        self.vbox = QVBoxLayout() 
-        self.vbox.setAlignment(Qt.AlignTop)
-        self.clearSpacing(self.vbox)              # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+        self.setup_tabs()
 
+    def setup_tabs(self):
+        self.left_tab_bar = QTabWidget()
+        self.left_tab_bar.setTabPosition(QTabWidget.West)
 
+        self.database_list = DatabaseList(self.connection, self.select_database)
+        self.left_tab_bar.addTab(self.database_list, "Databases")
 
-        self.widget.setLayout(self.vbox)
-        self.widget.setFixedWidth(250)
-        self.widget.setObjectName("tablesList")
-        #Scroll Area Properties
-        #self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setWidget(self.widget)
+        self.tables_list = TablesList(self.connection, self.select_table)
+        self.left_tab_bar.addTab(self.tables_list, "Tables")
         
 
-        self.fixed = QWidget()
-        self.fixed.adjustSize()
+        general_layout = QHBoxLayout()
+        general_layout.addWidget(self.left_tab_bar)
 
-        self.dbList = self.databasesList()
+        self.clear_spacing(general_layout)
+        general_layout.setAlignment(Qt.AlignTop)
 
-        self.leftTabBar = QTabWidget()
-        self.leftTabBar.setTabPosition(QTabWidget.West)
-
-        self.leftTabBar.addTab(self.dbList,"Databases")
-        self.leftTabBar.addTab(self.scroll,"Tables")
-        self.leftTabBar.setStyleSheet("""
-            QTabBar::tab {
-                width: 30px;   /* Adjust width */
-                padding: 5px;
-                border-bottom: 1px solid black;
-            }
-            QTabWidget::tab-bar {
-                alignment: left;  /* Align text to the top */
-            }
-        """)
-
-        
-        general = self.buildLayout(
-            layout  = QHBoxLayout(), 
-            widgets = [
-                self.leftTabBar,
-                self.fixed
-
-            ]
-        )
-        self.clearSpacing(general)
-        general.setAlignment(Qt.AlignTop)
         widget = QWidget()
-        widget.setLayout(general)
-
+        widget.setLayout(general_layout)
         self.setCentralWidget(widget)
+
+    def select_database(self, database):
+        self.database_list.uncheck_all_except(database)
+        self.tables_list.update_tables(database)
+        self.left_tab_bar.setCurrentIndex(1)
+
+    def select_table(self, table):
+        self.tables_list.uncheck_all_except(table)
+        print(table)
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-        self.mainView.deleteLater()
+        self.main_view.deleteLater()
 
     def save_connection(self, host: str, user: str, password: str):
         with open('datas/connection.json', 'w') as file:
             json.dump({"host": host, "user": user, "password": password}, file)
-
-    def clearSpacing(self,layout):
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-    def buildLayout(self, layout, widgets: list):
-        for widget in widgets:
-            layout.addWidget(widget)
-        return layout
 
     def load_connection(self):
         try:
@@ -200,6 +121,11 @@ class MainWindow(QMainWindow):
                     self.inputs.fields["Save connection?"].setChecked(True)
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading connection: {e}")
+
+    def clear_spacing(self, layout):
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

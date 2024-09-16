@@ -5,45 +5,45 @@ class Inputs:
     def __init__(self):
         self.fields = {}
 
-    def text(self, text: str) -> QWidget:
-        input_ = QLineEdit()
-        input_.setFixedWidth(250)
-        label = QLabel(text)
-        self.fields[text] = input_
-        return buildWidget(input_, label, Qt.AlignCenter)
+    def create_text_input(self, label_text: str) -> QWidget:
+        input_field = QLineEdit()
+        input_field.setFixedWidth(250)
+        label = QLabel(label_text)
+        self.fields[label_text] = input_field
+        return self._build_widget(input_field, label, Qt.AlignCenter)
 
-    def password(self, text: str) -> QWidget:
-        input_ = QLineEdit()
-        input_.setFixedWidth(250)
-        input_.setEchoMode(QLineEdit.Password)
-        label = QLabel(text)
-        self.fields[text] = input_
-        return buildWidget(input_, label, Qt.AlignCenter)
+    def create_password_input(self, label_text: str) -> QWidget:
+        input_field = QLineEdit()
+        input_field.setFixedWidth(250)
+        input_field.setEchoMode(QLineEdit.Password)
+        label = QLabel(label_text)
+        self.fields[label_text] = input_field
+        return self._build_widget(input_field, label, Qt.AlignCenter)
 
-    def checkbox(self, text: str) -> QWidget:
-        input_ = QCheckBox()
-        label = QLabel(text)
-        self.fields[text] = input_
-        return buildWidget(input_, label, Qt.AlignLeft, 'right')
+    def create_checkbox(self, label_text: str) -> QWidget:
+        checkbox = QCheckBox()
+        label = QLabel(label_text)
+        self.fields[label_text] = checkbox
+        return self._build_widget(checkbox, label, Qt.AlignLeft, 'right')
 
     @staticmethod
-    def button(text: str, action = None) -> QPushButton:
-        button = QPushButton(text)
+    def create_button(label_text: str, action=None) -> QPushButton:
+        button = QPushButton(label_text)
         button.setCheckable(True)
         if action:
             button.clicked.connect(action)
         return button
 
-def buildWidget(input_, label, align, label_placement='left') -> QWidget:
-    field = QHBoxLayout()
-    if label_placement == 'left':
-        field.addWidget(label)
-        field.addWidget(input_)
-    else:
-        field.addWidget(input_)
-        field.addWidget(label)
-    field.setAlignment(align)
-    field.setContentsMargins(10, 0, 10, 5)
-    widget = QWidget()
-    widget.setLayout(field)
-    return widget
+    def _build_widget(self, input_field, label, alignment, label_placement='left') -> QWidget:
+        layout = QHBoxLayout()
+        if label_placement == 'left':
+            layout.addWidget(label)
+            layout.addWidget(input_field)
+        else:
+            layout.addWidget(input_field)
+            layout.addWidget(label)
+        layout.setAlignment(alignment)
+        layout.setContentsMargins(10, 0, 10, 5)
+        widget = QWidget()
+        widget.setLayout(layout)
+        return widget
