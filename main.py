@@ -50,11 +50,19 @@ class MainWindow(QMainWindow):
             button.setFixedWidth(250)
             layout.addWidget(button)
 
-        widget = QWidget()
-        widget.setObjectName("databasesList")
+
+        scroll = QScrollArea()             # Scroll Area which contains the widgets, set as the centralWidget
+        widget = QWidget()                 # Widget that contains the collection of Vertical Box
         widget.setLayout(layout)
-        widget.setFixedSize(QSize(250, 700))
-        return widget
+        widget.setFixedWidth(250)
+        widget.setObjectName("databasesList")
+        #Scroll Area Properties
+        #self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(widget)
+
+        return scroll
 
     def selectDatabase(self,database):
         print(database)
