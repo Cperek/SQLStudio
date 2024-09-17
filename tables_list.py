@@ -10,9 +10,7 @@ class TablesList(QWidget):
         self.tables = []
 
         self.vbox = QVBoxLayout()
-        self.vbox.setContentsMargins(0, 0, 0, 0)
-        self.vbox.setSpacing(0)
-        self.vbox.setAlignment(Qt.AlignTop)
+        self.clear_spacing(self.vbox)
 
         self.scroll = QScrollArea()
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -23,9 +21,7 @@ class TablesList(QWidget):
 
     def setup_ui(self):
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignTop)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        self.clear_spacing(layout)
         layout.addWidget(self.scroll)
         self.setLayout(layout)
 
@@ -42,11 +38,10 @@ class TablesList(QWidget):
             self.vbox.addWidget(button)
             self.tables.append(button)
 
-        self.vbox.setContentsMargins(0, 0, 0, 0)
-        self.vbox.setSpacing(0)
-        self.vbox.setAlignment(Qt.AlignTop)
+        self.clear_spacing(self.vbox)
         self.scroll.widget().setLayout(self.vbox)
-        self.scroll.setFixedSize(250, 700)
+        self.scroll.setFixedWidth(250);
+        self.scroll.setMinimumHeight(700);
         self.scroll.widget().setObjectName("tablesList")
 
     def select_table(self, table):
@@ -56,3 +51,8 @@ class TablesList(QWidget):
         for button in self.tables:
             if button.text() != table:
                 button.setChecked(False)
+
+    def clear_spacing(self, layout):
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(Qt.AlignTop)

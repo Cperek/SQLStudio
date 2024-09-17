@@ -47,7 +47,8 @@ class MainWindow(QMainWindow):
         return layout
 
     def submit_connection(self):
-        self.setFixedSize(QSize(1250, 700))
+        self.setMaximumSize(QSize(16777215, 16777215))
+        self.setMinimumSize(QSize(1250,700))
         self.center()
 
         host = self.inputs.fields["Host"].text()
