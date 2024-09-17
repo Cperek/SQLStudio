@@ -26,6 +26,20 @@ class MySQLConnect:
         cursor.close()
         return databases
     
+    def select_all(self, table: str) -> list:
+        cursor = self.connection.cursor()
+        cursor.execute(f"SELECT * FROM {table}")
+        data = cursor.fetchall()
+        cursor.close()
+        return data
+    
+    def show_columns(self, table: str) -> list:
+        cursor = self.connection.cursor()
+        cursor.execute(f"SHOW COLUMNS FROM {table}")
+        data = cursor.fetchall()
+        cursor.close()
+        return data
+    
     def fetch_tables(self) -> list:
         if not self.connection.is_connected():
             return []

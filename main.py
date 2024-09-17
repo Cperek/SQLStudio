@@ -6,6 +6,7 @@ import json
 from inputs import Inputs
 from database_list import DatabaseList
 from tables_list import TablesList
+from table_element import Table
 
 
 class MainWindow(QMainWindow):
@@ -15,6 +16,7 @@ class MainWindow(QMainWindow):
         self.initUI()
         self.load_connection()
         self.connection = None
+        
 
     def initUI(self):
         self.setWindowTitle("CrunchSQL - Database Manager")
@@ -78,16 +80,15 @@ class MainWindow(QMainWindow):
 
         self.tables_list = TablesList(self.connection, self.select_table)
         self.left_tab_bar.addTab(self.tables_list, "Tables")
-        
 
-        general_layout = QHBoxLayout()
-        general_layout.addWidget(self.left_tab_bar)
+        self.general_layout = QHBoxLayout()
+        self.general_layout.addWidget(self.left_tab_bar, alignment=Qt.AlignLeft)
 
-        self.clear_spacing(general_layout)
-        general_layout.setAlignment(Qt.AlignTop)
+        self.clear_spacing(self.general_layout)
+        self.general_layout.setAlignment(Qt.AlignTop)
 
         widget = QWidget()
-        widget.setLayout(general_layout)
+        widget.setLayout(self.general_layout)
         self.setCentralWidget(widget)
 
     def select_database(self, database):
@@ -97,8 +98,14 @@ class MainWindow(QMainWindow):
 
     def select_table(self, table):
         self.tables_list.uncheck_all_except(table)
-        print(table)
 
+        if hasattr(self, 'tableElemet'):
+            self.general_layout.removeWidget(self.tableElemet)
+            self.tableElemet.deleteLater()
+
+        self.tableElemet = Table(self.connection, table)
+        self.general_layout.addWidget(self.tableElemet)
+        
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
