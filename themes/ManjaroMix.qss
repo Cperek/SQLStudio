@@ -561,4 +561,14 @@ QHeaderView::section, QHeaderView::section:focus,QHeaderView::section:checked  {
 QTableView {
     selection-background-color: #4fa08b;
 }
-
+QWidget#console{
+	background-color: #151a1e;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	color: #54625c;
+}
+QWidget#console > QLabel{
+	color: #54625c;
+	font-size: 12px;
+}

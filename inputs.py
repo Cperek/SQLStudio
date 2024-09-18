@@ -35,9 +35,9 @@ class Inputs:
         return button
 
     @staticmethod
-    def create_search_input(label_text: str, action=None) -> QLineEdit:
+    def create_search_input(label_text: str, action=None, width: str = 250) -> QLineEdit:
         input_field = QLineEdit()
-        input_field.setFixedWidth(250)
+        input_field.setFixedWidth(width)
         input_field.setPlaceholderText(label_text)
         if action:
             input_field.textChanged.connect(action)

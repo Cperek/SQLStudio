@@ -6,8 +6,9 @@ class Table(QWidget):
     def __init__(self, connection, table):
         super().__init__()
         self.connection = connection
+        self.table_name = table
         self.headers = {}
-        self.order = Qt.AscendingOrder
+        self.order = 'ASC'
         self.vbox = QVBoxLayout()
         self.clear_spacing(self.vbox)
 
@@ -15,27 +16,24 @@ class Table(QWidget):
         self.scroll.setWidgetResizable(True)
         self.table = QTableWidget()  
         self.table.setObjectName("table_preview")
+        #self.table.setSortingEnabled(True)
         self.scroll.setWidget(self.table)
 
         self.setup_ui()
 
-        columns = connection.show_columns(table)
+        self.columns = connection.show_columns(table)
         records = connection.select_all(table)
         self.table.setRowCount(len(records))
-        self.table.setColumnCount(len(columns))
+        self.table.setColumnCount(len(self.columns))
 
-        for column in columns:
+        for column in self.columns:
             header = QTableWidgetItem(column[0])
             header.setIcon(QIcon("icons/sort-solid.svg"))
             header.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            self.headers[columns.index(column)] = header
-            self.table.setHorizontalHeaderItem(columns.index(column),header)
+            self.headers[self.columns.index(column)] = header
+            self.table.setHorizontalHeaderItem(self.columns.index(column),header)
 
-        for record in records:
-            for column in columns:
-                item = QTableWidgetItem(str(record[columns.index(column)]))
-                #item.setTextAlignment(Qt.AlignCenter)
-                self.table.setItem(records.index(record), columns.index(column), item)
+        self.buildRows(records)
 
         #self.table.horizontalHeader().setStretchLastSection(True)
         #self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -45,15 +43,24 @@ class Table(QWidget):
         self.scroll.setMinimumHeight(700)
         self.scroll.setObjectName("tableElement")
 
+    def buildRows(self, records):
+        for record in records:
+            for column in self.columns:
+                item = QTableWidgetItem(str(record[self.columns.index(column)]))
+                self.table.setItem(records.index(record), self.columns.index(column), item)
+
     def sort(self, column):
-        self.table.sortItems(column, self.order)
+        #slow but had issues with build-in QTableWidget SortItems...
+        records = self.connection.select_all(self.table_name,self.headers[column].text(), self.order)
+        self.table.setRowCount(len(records))
+        self.buildRows(records)
 
-        if self.order == Qt.AscendingOrder:
+        if self.order == 'ASC':
 
-            self.order = Qt.DescendingOrder
+            self.order = 'DESC'
             self.headers[column].setIcon(QIcon("icons/sort-up-solid.svg"))
         else:
-            self.order = Qt.AscendingOrder
+            self.order = 'ASC'
             self.headers[column].setIcon(QIcon("icons/sort-down-solid.svg"))
 
         for key in self.headers:

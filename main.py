@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QDesktopWidget, QHBoxLayout, QScrollArea, QTabWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget,QLabel, QDesktopWidget, QHBoxLayout, QScrollArea, QTabWidget
 from mysql_connect import MySQLConnect
 import sys
 import json
@@ -82,14 +82,47 @@ class MainWindow(QMainWindow):
         self.tables_list = TablesList(self.connection, self.select_table)
         self.left_tab_bar.addTab(self.tables_list, "Tables")
 
+        self.main_layout = QVBoxLayout()
         self.general_layout = QHBoxLayout()
         self.general_layout.addWidget(self.left_tab_bar, alignment=Qt.AlignLeft)
 
         self.clear_spacing(self.general_layout)
         self.general_layout.setAlignment(Qt.AlignTop)
 
+        
         widget = QWidget()
         widget.setLayout(self.general_layout)
+        self.main_layout.addWidget(widget)
+        self.main_layout.setAlignment(Qt.AlignTop)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+
+        self.console = QLabel()
+        self.console.setFixedHeight(25)
+        self.console.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.console.setContentsMargins(0, 0, 10, 0)
+
+        qh = QHBoxLayout()
+        qh.setAlignment(Qt.AlignRight)
+        qh.setContentsMargins(0, 0, 0, 0)
+        qh.setSpacing(0)
+
+        ver = QWidget()
+        ver.setFixedWidth(290)
+        qh.addWidget(ver)
+        qh.addWidget(self.inputs.create_search_input("filter: ",None,400))
+        qh.addWidget(self.console)
+
+        tmp = QWidget()
+        tmp.setLayout(qh)
+        tmp.setObjectName("console")
+        tmp.setFixedHeight(25)
+        self.main_layout.addWidget(tmp, 1)
+
+        self.connection.console = self.console
+
+        widget = QWidget()
+        widget.setLayout(self.main_layout)
         self.setCentralWidget(widget)
 
     def select_database(self, database):
@@ -103,7 +136,7 @@ class MainWindow(QMainWindow):
         if hasattr(self, 'tableElemet'):
             self.general_layout.removeWidget(self.tableElemet)
             self.tableElemet.deleteLater()
-
+        
         self.tableElemet = Table(self.connection, table)
         self.general_layout.addWidget(self.tableElemet)
         
