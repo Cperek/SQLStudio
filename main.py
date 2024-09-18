@@ -6,7 +6,7 @@ import json
 from inputs import Inputs
 from database_list import DatabaseList
 from tables_list import TablesList
-from table_element import Table
+from table_preview import Table
 
 
 class MainWindow(QMainWindow):
@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
     def setup_tabs(self):
         self.left_tab_bar = QTabWidget()
         self.left_tab_bar.setTabPosition(QTabWidget.West)
+        self.left_tab_bar.setFixedWidth(290)
 
         self.database_list = DatabaseList(self.connection, self.select_database)
         self.left_tab_bar.addTab(self.database_list, "Databases")
@@ -137,6 +138,8 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

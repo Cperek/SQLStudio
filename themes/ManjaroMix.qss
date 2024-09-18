@@ -160,7 +160,7 @@ QTabWidget {
 }
 QTabWidget::pane {
 		border-color: #050a0e;
-		background-color: #1e282c;
+		background-color: #222b2e;
 		border-style: solid;
 		border-width: 1px;
     	border-bottom-left-radius: 4px;
@@ -398,16 +398,16 @@ QSlider::handle:vertical {
 	border-radius: 7px;
 }
 QSlider::add-page:horizontal {
-    background: #52595d;
+    background: #222b2e;
 }
 QSlider::add-page:vertical {
-    background: #52595d;
+    background: #222b2e;
 }
 QSlider::sub-page:horizontal {
-    background-color: #15433a;
+    background-color: #222b2e;
 }
 QSlider::sub-page:vertical {
-    background-color: #15433a;
+    background-color: #222b2e;
 }
 QScrollBar:horizontal {
 	max-height: 10px;
@@ -529,6 +529,7 @@ QWidget#databasesList, QWidget#tablesList{
 	border-right:1px;
 	border-color: black;
 	border-style: solid;
+	background-color: #222b2e;
 }
 QWidget#databasesList > QPushButton, QWidget#tablesList > QPushButton{
 	border-radius: 0;
@@ -551,3 +552,13 @@ QTabBar::tab {
 QTabWidget::tab-bar {
 	alignment: left;  /* Align text to the top */
 }
+QTableView::item:focus{
+    background-color: #4fa08b;
+}
+QHeaderView::section, QHeaderView::section:focus,QHeaderView::section:checked  {
+   background: #151a1e;
+}
+QTableView {
+    selection-background-color: #4fa08b;
+}
+

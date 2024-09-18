@@ -11,7 +11,7 @@ class Inputs:
         label = QLabel(label_text)
         self.fields[label_text] = input_field
         return self._build_widget(input_field, label, Qt.AlignCenter)
-
+    
     def create_password_input(self, label_text: str) -> QWidget:
         input_field = QLineEdit()
         input_field.setFixedWidth(250)
@@ -33,6 +33,16 @@ class Inputs:
         if action:
             button.clicked.connect(action)
         return button
+
+    @staticmethod
+    def create_search_input(label_text: str, action=None) -> QLineEdit:
+        input_field = QLineEdit()
+        input_field.setFixedWidth(250)
+        input_field.setPlaceholderText(label_text)
+        if action:
+            input_field.textChanged.connect(action)
+
+        return input_field
 
     def _build_widget(self, input_field, label, alignment, label_placement='left') -> QWidget:
         layout = QHBoxLayout()

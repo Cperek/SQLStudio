@@ -10,22 +10,24 @@ class DatabaseList(QWidget):
         self.databases = []
 
         self.vbox = QVBoxLayout()
-        self.clear_spacing(self.vbox)
+        self.vbox.setAlignment(Qt.AlignTop)
+        self.vbox.setContentsMargins(0, 0, 0, 0)
+        self.vbox.setSpacing(0)
 
         self.scroll = QScrollArea()
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.scroll.setWidgetResizable(True)
         self.scroll.setWidget(QWidget())
 
         self.setup_ui()
-            
+        
         for record in connection.databases:
             button = Inputs.create_button(record[0], lambda checked, db=record[0]: self.select_database(db))
             self.databases.append(button)
             button.setFixedWidth(250)
             self.vbox.addWidget(button)
 
-        self.clear_spacing(self.vbox)
         self.scroll.widget().setLayout(self.vbox)
         self.scroll.setFixedWidth(250);
         self.scroll.setMinimumHeight(700);
@@ -33,9 +35,21 @@ class DatabaseList(QWidget):
 
     def setup_ui(self):
         layout = QVBoxLayout()
-        self.clear_spacing(layout)
+        layout.setAlignment(Qt.AlignTop)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        
+        self.search_input = Inputs.create_search_input('Search...', lambda text: self.search(text))
+        layout.addWidget(self.search_input)  
         layout.addWidget(self.scroll)
         self.setLayout(layout)
+
+    def search(self, text):
+        for db in self.databases:
+            if text.lower() in db.text().lower():
+                db.show()
+            else:
+                db.hide()
 
     def select_database(self, database):
         self.select_database_callback(database)
