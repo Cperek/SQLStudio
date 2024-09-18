@@ -98,6 +98,7 @@ class MainWindow(QMainWindow):
         self.main_layout.setSpacing(0)
 
         self.console = QLabel()
+        self.console.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.console.setFixedHeight(25)
         self.console.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.console.setContentsMargins(0, 0, 10, 0)
