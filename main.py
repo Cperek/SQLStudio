@@ -7,6 +7,7 @@ from inputs import Inputs
 from database_list import DatabaseList
 from tables_list import TablesList
 from table_preview import Table
+from toolbar import Toolbar
 
 
 class MainWindow(QMainWindow):
@@ -89,9 +90,11 @@ class MainWindow(QMainWindow):
         self.clear_spacing(self.general_layout)
         self.general_layout.setAlignment(Qt.AlignTop)
 
+        self.toolbar = Toolbar(self.menuBar())
         
         widget = QWidget()
         widget.setLayout(self.general_layout)
+        self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(widget)
         self.main_layout.setAlignment(Qt.AlignTop)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -108,10 +111,13 @@ class MainWindow(QMainWindow):
         qh.setContentsMargins(0, 0, 0, 0)
         qh.setSpacing(0)
 
+        self.filter = self.inputs.create_search_input("filter: ",None,400)
+        self.filter.returnPressed.connect(lambda: self.filter_tabe(self.filter.text()))
         ver = QWidget()
         ver.setFixedWidth(290)
         qh.addWidget(ver)
-        qh.addWidget(self.inputs.create_search_input("filter: ",None,400))
+        qh.addWidget(self.filter)
+
         qh.addWidget(self.console)
 
         tmp = QWidget()
@@ -130,6 +136,10 @@ class MainWindow(QMainWindow):
         self.database_list.uncheck_all_except(database)
         self.tables_list.update_tables(database)
         self.left_tab_bar.setCurrentIndex(1)
+
+    def filter_tabe(self,where: str):
+         if hasattr(self, 'tableElemet'):
+             self.tableElemet.filter(where)
 
     def select_table(self, table):
         self.tables_list.uncheck_all_except(table)

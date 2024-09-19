@@ -30,9 +30,12 @@ class MySQLConnect:
         cursor.close()
         return databases
     
-    def select_all(self, table: str, order_by: str = '', sort:str = 'ASC' ) -> list:
+    def select_all(self, table: str, where: str = '', order_by: str = '', sort:str = 'ASC' ) -> list:
         cursor = self.connection.cursor()
-        sql = f"SELECT * FROM {table}"
+        
+        where = f"WHERE {where}" if where else ''
+
+        sql = f"SELECT * FROM {table} {where}"
         if order_by:
             sql += f" ORDER BY {order_by} {sort}"
         self.log(sql)

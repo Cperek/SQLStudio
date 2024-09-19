@@ -7,6 +7,7 @@ class Table(QWidget):
         super().__init__()
         self.connection = connection
         self.table_name = table
+        self.where = ''
         self.headers = {}
         self.order = 'ASC'
         self.vbox = QVBoxLayout()
@@ -51,7 +52,7 @@ class Table(QWidget):
 
     def sort(self, column):
         #slow but had issues with build-in QTableWidget SortItems...
-        records = self.connection.select_all(self.table_name,self.headers[column].text(), self.order)
+        records = self.connection.select_all(self.table_name,self.where,self.headers[column].text(), self.order)
         self.table.setRowCount(len(records))
         self.buildRows(records)
 
@@ -66,6 +67,14 @@ class Table(QWidget):
         for key in self.headers:
             if key != column:
                 self.headers[key].setIcon(QIcon("icons/sort-solid.svg"))
+
+    def filter(self, where:str):
+        self.where = where
+        records = self.connection.select_all(self.table_name,self.where)
+        self.table.setRowCount(len(records))
+        self.buildRows(records)
+
+        
 
     def setup_ui(self):
         layout = QVBoxLayout()
