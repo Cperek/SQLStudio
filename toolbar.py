@@ -4,16 +4,17 @@ class Toolbar(QToolBar):
         super().__init__()
         self.MainMenu = MainMenu
         self.action_buttons = {
-            'file': QAction("File", self),
+            'files': QAction("Files", self),
             'edit': QAction("Edit", self),
             'action': QAction("Action", self),
             'view': QAction("View", self)
         }
 
         self.menus = {
-            'file': {
+            'files': {
                 'new': QAction("New connection", self),
                 'open': QAction("Import SQL from flie", self),
+                'settings': QAction("Option", self),
                 'close': QAction("Close", self),
             },
             'edit': {
@@ -42,8 +43,8 @@ class Toolbar(QToolBar):
 
     def initButtons(self):
         for name,menu in self.action_buttons.items():
-            self.addAction(menu)
-            self.addSeparator()
+            #self.addAction(menu)
+            #self.addSeparator()
 
             section = self.MainMenu.addMenu("&"+name.capitalize())
             for action in self.menus[name].values():
